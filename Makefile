@@ -17,6 +17,6 @@ install:
 
 tarball:
 	mkdir susemanager-cloud-setup-$(version)
-	cp COPYING Makefile susemanager-cloud-setup-functions.sh suma-storage-server suma-storage-proxy susemanager-cloud-setup-$(version)
+	cp LICENSE Makefile susemanager-cloud-setup-functions.sh suma-storage-server suma-storage-proxy susemanager-cloud-setup-$(version)
 	tar czf susemanager-cloud-setup-$(version).tar.gz susemanager-cloud-setup-$(version)
 	rm -r susemanager-cloud-setup-$(version)
