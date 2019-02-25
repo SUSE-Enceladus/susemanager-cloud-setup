@@ -68,19 +68,11 @@ get_first_partition_device() {
 create_partition() {
     test -z "$1" && die "create_parition called without argument"
     local disk=$1
-    local result=$(yes | parted $disk mklabel msdos 2>&1)
+    local result=$(parted -s $disk mklabel GPT 2>&1)
     if [ $? != 0 ]; then
-        die "Creating new msdos label failed: $result"
+        die "Creating new GPT label failed: $result"
     fi
-    local cmd_sequence=$(mktemp -t fdisk_cmd_sequence.XXXXXX)
-    for cmd in n p 1 . . w;do
-        if [ $cmd = "." ];then
-            echo >> $cmd_sequence
-            continue
-        fi
-        echo $cmd >> $cmd_sequence
-    done
-    result=$(fdisk $disk < $cmd_sequence 2>&1)
+    local result=$(parted -s $disk mkpart primary 2048s 100% 2>&1)
     if [ $? != 0 ]; then
         die "Partition setup failed: $result"
     fi
