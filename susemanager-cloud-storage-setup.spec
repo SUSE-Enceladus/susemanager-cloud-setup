@@ -16,31 +16,31 @@
 #
 
 
-Name:           susemanager-cloud-setup
+Name:           susemanager-cloud-storage-setup
 Version:        1.0
 Release:        0
 Summary:        Storage setup script for SUSE Manager
 License:        GPL-3.0-or-later
 Group:          System/Management
 Url:            https://github.com/SUSE-Enceladus/susemanager-cloud-setup
-Source:         susemanager-cloud-setup-%{version}.tar.gz
+Source:         susemanager-cloud-storage-setup-%{version}.tar.gz
 
 %description
-A simple script that sets up external storage for SUSE Manager.
+A script that sets up external storage for SUSE Manager.
 
 %package server
 Summary:        Storage setup script for SUSE Manager Server
 Conflicts:      %{name}-proxy
 
 %description server
-A simple script that sets up external storage for SUSE Manager Server.
+A script that sets up external storage for SUSE Manager Server.
 
 %package proxy
 Summary:        Storage setup script for SUSE Manager Proxy
 Conflicts:      %{name}-server
 
 %description proxy
-A simple script that sets up external storage for SUSE Manager Proxy.
+A script that sets up external storage for SUSE Manager Proxy.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -50,13 +50,13 @@ A simple script that sets up external storage for SUSE Manager Proxy.
 %install
 make install DESTDIR=%{buildroot} PREFIX=%{_usr}
 
-%post -n susemanager-cloud-setup-server
+%post -n susemanager-cloud-storage-setup-server
 ln -sf suma-storage-server %{_usr}/bin/suma-storage
 
-%post -n susemanager-cloud-setup-proxy
+%post -n susemanager-cloud-storage-setup-proxy
 ln -sf suma-storage-proxy %{_usr}/bin/suma-storage
 
-%files -n susemanager-cloud-setup-server
+%files -n susemanager-cloud-storage-setup-server
 %attr(755,root,root) %{_usr}/bin/suma-storage-server
 %attr(755,root,root) %{_usr}/lib/susemanager
 %ghost %{_usr}/bin/suma-storage
