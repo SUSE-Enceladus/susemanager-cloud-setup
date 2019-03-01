@@ -94,11 +94,15 @@ update_fstab() {
     test -z "$2" && die "update_fstab called without arguments"
     local part=$(get_first_partition_device $1)
     local mount_point=$2
-    if grep -qi $part /etc/fstab; then
-        die "$part already added to fstab"
+    local uuid=$(blkid -s UUID -o value $part)
+    if [ -z "$uuid" ]; then
+        die "could not determine UUID of $part"
+    fi
+    if grep -qi "$uuid" /etc/fstab; then
+        die "$uuid already added to fstab"
     fi
     local fs=$(blkid -s TYPE $part -o value)
-    echo "$part $mount_point $fs defaults 1 1" >> /etc/fstab
+    echo "UUID=$uuid $mount_point $fs defaults 1 2" >> /etc/fstab
 }
 
 mount_storage() {
