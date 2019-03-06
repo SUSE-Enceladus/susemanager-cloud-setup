@@ -102,7 +102,7 @@ update_fstab() {
         die "$uuid already added to fstab"
     fi
     local fs=$(blkid -s TYPE $part -o value)
-    echo "UUID=$uuid $mount_point $fs defaults 1 2" >> /etc/fstab
+    echo "UUID=$uuid $mount_point $fs defaults,nofail 1 2" >> /etc/fstab
 }
 
 mount_storage() {
