@@ -52,7 +52,7 @@ mount_storage $storage_disk $storage_location
 info "Syncing SUSE Manager Proxy directories to storage disk"
 move_storage /var/cache/squid $storage_location 
 
-echo "To make the use of this storage device persistent, you may need to add it"
-echo "to /etc/fstab (mount point is $storage_location)."
+info "Creating entry in /etc/fstab"
+update_fstab $storage_disk $storage_location
 
 exit 0

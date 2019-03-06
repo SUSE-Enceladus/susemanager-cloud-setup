@@ -60,7 +60,7 @@ else
     ln -s ${storage_location}/spacewalk /var/spacewalk
 fi
 
-echo "To make the use of this storage device persistent, you may need to add it"
-echo "to /etc/fstab (mount point is $storage_location)."
+info "Creating entry in /etc/fstab"
+update_fstab $storage_disk $storage_location
 
 exit 0
