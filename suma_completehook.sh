@@ -79,7 +79,8 @@ function listening {
 }
 
 if listening; then
-    echo "Creating SUSE Manager Admin user (password '$admin_pass')"
+    echo "Creating SUSE Manager Admin user"
+    echo "Admin password: '$admin_pass')" >>$LOGFILE
     curl -s -S -X POST \
         -k "https://localhost/rhn/newlogin/CreateFirstUser.do" \
         -d "submitted=true" \
@@ -92,6 +93,7 @@ if listening; then
         -d "prefix=Mr." \
         -d "orgName=Organisation"
     ret=$?
+    echo "NOTE: Admin password has been logged to ${LOGFILE}."
 else
     echo "Warning: http server not running, cannot create admin user."
     ret=1
