@@ -17,7 +17,7 @@
 
 
 Name:           susemanager-cloud-setup
-Version:        1.0
+Version:        1.1
 Release:        0
 Summary:        Cloud specific setup scripts for SUSE Manager
 License:        GPL-3.0-or-later
