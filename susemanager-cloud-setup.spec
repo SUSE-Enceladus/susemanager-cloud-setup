@@ -57,12 +57,14 @@ ln -sf suma-storage-server %{_usr}/bin/suma-storage
 ln -sf suma-storage-proxy %{_usr}/bin/suma-storage
 
 %files -n susemanager-cloud-setup-server
+%defattr(-,root,root)
 %attr(755,root,root) %{_usr}/bin/suma-storage-server
 %attr(755,root,root) %{_usr}/lib/susemanager
 %ghost %{_usr}/bin/suma-storage
 %license LICENSE
 
 %files -n susemanager-cloud-setup-proxy
+%defattr(-,root,root)
 %attr(755,root,root) %{_usr}/bin/suma-storage-proxy
 %attr(755,root,root) %{_usr}/lib/susemanager
 %ghost %{_usr}/bin/suma-storage

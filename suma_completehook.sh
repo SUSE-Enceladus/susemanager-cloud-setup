@@ -80,7 +80,7 @@ function listening {
 
 if listening; then
     echo "Creating SUSE Manager Admin user"
-    echo "Admin password: '$admin_pass')" >>$LOGFILE
+    echo "Admin password: '$admin_pass'" >>$LOGFILE
     curl -s -S -X POST \
         -k "https://localhost/rhn/newlogin/CreateFirstUser.do" \
         -d "submitted=true" \
