@@ -54,6 +54,7 @@ if [[ -f /etc/motd.finished ]]; then
     mv /etc/motd.finished /etc/motd
 
     # Update motd message now that the service is running
+    echo >> /etc/motd
     echo "You can access SUSE Manager via https://$public_hostname" >> /etc/motd
 fi
 
