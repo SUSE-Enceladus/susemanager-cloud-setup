@@ -29,23 +29,22 @@ exec &> >(tee -a $LOGFILE)
 echo "$0 started `date`"
 
 if [[ -n $AZUREMETADATA ]]; then
-    public_hostname=$($AZUREMETADATA --cloud-service --bare)
     admin_pass=$($AZUREMETADATA --instance-name --bare)-suma
 fi
 if [[ -n $EC2METADATA && -z $public_hostname ]]; then
-    public_hostname=$($EC2METADATA --public-hostname)
     admin_pass=$($EC2METADATA --instance-id)
 fi
 if [[ -n $GCEMETADATA && -z $public_hostname ]]; then
-    public_hostname=`host $($GCEMETADATA --query instance --external-ip) | sed -r -e 's/(.* )(.*)./\2/'`
     admin_pass=$($GCEMETADATA --query instance --id)
 fi
 
-# fallbacks
+public_hostname=$(hostname -f)
 if [[ -z $public_hostname ]]; then
-    public_hostname=$(hostname -f)
-    echo "Warning: Could not detect cloud framework or public hostname. Using '$public_hostname'."
+    echo "Warning: \`hostname -f\` does not return a host name. Your setup is probably broken."
+   public_hostname=$(hostname)
 fi
+
+# fallback password
 if [[ -z $admin_pass ]]; then
     admin_pass=$(dd if=/dev/random bs=1 |tr -cd '[a-zA-Z0-9!@#$%^&]' |head -c 12)
     echo "Warning: Could not detect cloud framework. Using random admin password."
@@ -55,6 +54,7 @@ if [[ -f /etc/motd.finished ]]; then
     mv /etc/motd.finished /etc/motd
 
     # Update motd message now that the service is running
+    echo >> /etc/motd
     echo "You can access SUSE Manager via https://$public_hostname" >> /etc/motd
 fi
 
