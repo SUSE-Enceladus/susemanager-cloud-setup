@@ -15,59 +15,47 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
+%define base_name susemanager-cloud-setup
 
-Name:           susemanager-cloud-setup
-Version:        1.2
+%if "@BUILD_FLAVOR@" == ""
+%define flavor_suffix %nil
+ExclusiveArch:  do-not-build
+%endif
+%if "@BUILD_FLAVOR@" == "server"
+%define flavor_suffix -server
+%endif
+%if "@BUILD_FLAVOR@" == "proxy"
+%define flavor_suffix -proxy
+%endif
+
+Name:           %{base_name}%{flavor_suffix}
+Version:        1.3
 Release:        0
 Summary:        Cloud specific setup scripts for SUSE Manager
 License:        GPL-3.0-or-later
 Group:          System/Management
 Url:            https://github.com/SUSE-Enceladus/susemanager-cloud-setup
-Source:         susemanager-cloud-setup-%{version}.tar.gz
+Source:         %{base_name}-%{version}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildArch:      noarch
+Provides:       %{base_name}
+Conflicts:      %{base_name}
 
-%description
+%description -n %{base_name}%{flavor_suffix}
 Scripts that help setting up SUSE Manager in the cloud.
 
-%package server
-Summary:        Cloud specific setup scripts for SUSE Manager
-Conflicts:      %{name}-proxy
-
-%description server
-Scripts that help setting up SUSE Manager Server in the cloud.
-
-%package proxy
-Summary:        Storage setup script for SUSE Manager Proxy
-Conflicts:      %{name}-server
-
-%description proxy
-A script that sets up external storage for SUSE Manager Proxy.
-
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{base_name}-%{version}
 
 %build
 
 %install
-make install DESTDIR=%{buildroot} PREFIX=%{_usr}
+make install%{flavor_suffix} DESTDIR=%{buildroot} PREFIX=%{_usr}
 
-%post -n susemanager-cloud-setup-server
-ln -sf suma-storage-server %{_usr}/bin/suma-storage
-
-%post -n susemanager-cloud-setup-proxy
-ln -sf suma-storage-proxy %{_usr}/bin/suma-storage
-
-%files -n susemanager-cloud-setup-server
+%files -n %{base_name}%{flavor_suffix}
 %defattr(-,root,root)
-%attr(755,root,root) %{_usr}/bin/suma-storage-server
+%attr(755,root,root) %{_usr}/bin/suma-storage
 %attr(755,root,root) %{_usr}/lib/susemanager
-%ghost %{_usr}/bin/suma-storage
-%license LICENSE
-
-%files -n susemanager-cloud-setup-proxy
-%defattr(-,root,root)
-%attr(755,root,root) %{_usr}/bin/suma-storage-proxy
-%attr(755,root,root) %{_usr}/lib/susemanager
-%ghost %{_usr}/bin/suma-storage
 %license LICENSE
 
 %changelog
