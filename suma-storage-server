@@ -18,9 +18,19 @@
 
 . /usr/lib/susemanager/bin/susemanager-cloud-setup-functions.sh || exit 1
 
+usage() {
+    echo "Usage: $0 <storage-disk-device> [<database-disk-device>]"
+    echo
+    echo "If <database-disk-device> is specified, the given disk device will be set up"
+    echo "as data base storage (recommended). If omitted, <storage-disk-device> will"
+    echo "be used for both channel and data base storage."
+    echo
+}
+
 case "$1" in
   "-h"|"--help"|"")
     usage
+    exit 0
     ;;
 esac
 
@@ -32,12 +42,36 @@ storage_disk=$(linux_device $1)
 storage_fs=xfs
 storage_location="/manager_storage"
 
-if [ -z "$storage_disk" ] || [ ! -b "$storage_disk" ];then
+if [ -z "$storage_disk" ] || [ ! -b "$storage_disk" ]; then
     usage
     die "Given storage disk does not exist or is not a block device."
 fi
 
-info "Check disk for content signature"
+if [ -n "$2" ]; then
+    database_disk=$(linux_device $2)
+    if [ ! -b "$database_disk" ]; then
+        usage
+        die "Given storage disk does not exist or is not a block device."
+    fi
+    database_location="/pgsql_storage"
+else
+    database_disk="$storage_disk"
+    database_location="/manager_storage"
+fi
+
+if systemctl status spacewalk.target >/dev/null ; then
+    spacewalk_running=yes
+    info "Stop spacewalk services"
+    spacewalk-service stop
+fi
+
+if systemctl status postgresql.service >/dev/null ; then
+    postgres_running=yes
+    info "Stop postgresql service"
+    systemctl stop postgresql.service
+fi
+
+info "Checking disk for content signature"
 check_content_signature $storage_disk
 
 info "Creating partition on disk $storage_disk"
@@ -49,9 +83,24 @@ create_filesystem $storage_disk $storage_fs
 info "Mounting storage at $storage_location"
 mount_storage $storage_disk $storage_location
 
-info "Syncing SUSE Manager Server directories to storage disk"
-move_storage /var/lib/spacewalk $storage_location 
-move_storage /var/lib/pgsql $storage_location 
+if [ "$database_disk" != "$storage_disk" ]; then
+    info "Checking data base disk for content signature"
+    check_content_signature $database_disk
+
+    info "Creating partition on disk $database_disk"
+    create_partition $database_disk
+
+    info "Creating $storage_fs filesystem"
+    create_filesystem $database_disk $storage_fs
+
+    info "Mounting storage at $database_location"
+    mount_storage $database_disk $database_location
+fi
+
+info "Syncing SUSE Manager Server directories to storage disk(s)"
+move_storage /var/lib/spacewalk $storage_location
+move_storage /var/lib/pgsql $database_location
+move_storage /var/cache/rhn $storage_location
 if [ -d /var/spacewalk/packages ]; then
     # copy package storage
     move_storage /var/spacewalk ${storage_location}/spacewalk
@@ -62,5 +111,18 @@ fi
 
 info "Creating entry in /etc/fstab"
 update_fstab $storage_disk $storage_location
+if [ "$database_disk" != "$storage_disk" ]; then
+    update_fstab $database_disk $database_location
+fi
+
+if [ "$postgres_running" ]; then
+    info "Start postgresql service"
+    systemctl start postgresql.service
+fi
+
+if [ "$spacewalk_running" ]; then
+    info "Start SUSE Manager services"
+    spacewalk-service start
+fi
 
 exit 0

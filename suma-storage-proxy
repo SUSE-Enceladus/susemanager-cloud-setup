@@ -18,9 +18,16 @@
 
 . /usr/lib/susemanager/bin/susemanager-cloud-setup-functions.sh || exit 1
 
+
+usage() {
+    echo "Usage: $0 <storage-disk-device>"
+    echo
+}
+
 case "$1" in
   "-h"|"--help"|"")
     usage
+    exit 0
     ;;
 esac
 
@@ -37,7 +44,7 @@ if [ -z "$storage_disk" ] || [ ! -b "$storage_disk" ];then
     die "Given storage disk does not exist or is not a block device."
 fi
 
-info "Check disk for content signature"
+info "Checking disk for content signature"
 check_content_signature $storage_disk
 
 info "Creating partition on disk $storage_disk"
@@ -49,8 +56,19 @@ create_filesystem $storage_disk $storage_fs
 info "Mounting storage at $storage_location"
 mount_storage $storage_disk $storage_location
 
+if systemctl status squid.service >/dev/null ; then
+    squid_running=yes
+    info "Stopping squid service"
+    systemctl stop squid.service
+fi
+
 info "Syncing SUSE Manager Proxy directories to storage disk"
 move_storage /var/cache/squid $storage_location 
+
+if [ "$squid_running" = "yes" ]; then
+    info "Starting squid service"
+    systemctl start squid.service
+fi
 
 info "Creating entry in /etc/fstab"
 update_fstab $storage_disk $storage_location
