@@ -16,11 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 
-usage() {
-    echo "Usage: $0 <storage-disk-device>"
-    echo
-}
-
 info() {
     echo "--> $@"
 }
