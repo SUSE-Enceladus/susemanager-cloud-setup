@@ -29,7 +29,7 @@ exec &> >(tee -a $LOGFILE)
 echo "$0 started `date`"
 
 if [[ -n $AZUREMETADATA ]]; then
-    admin_pass=$($AZUREMETADATA --instance-name --bare)-suma
+    admin_pass=$($AZUREMETADATA --compute --name | awk '/name/ { print $2 }')-suma
 fi
 if [[ -n $EC2METADATA && -z $public_hostname ]]; then
     admin_pass=$($EC2METADATA --instance-id)
