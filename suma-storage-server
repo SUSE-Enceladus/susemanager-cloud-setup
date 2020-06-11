@@ -101,7 +101,7 @@ info "Syncing SUSE Manager Server directories to storage disk(s)"
 move_storage /var/lib/spacewalk $storage_location
 move_storage /var/lib/pgsql $database_location
 move_storage /var/cache/rhn $storage_location
-if [ -d /var/spacewalk/packages ]; then
+if [ -d /var/spacewalk ]; then
     # copy package storage
     move_storage /var/spacewalk ${storage_location}/spacewalk
 else
