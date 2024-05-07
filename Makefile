@@ -15,7 +15,6 @@ install-common:
 
 install-server: install-common
 	mkdir -p $(DEST_LIBDIR)/hooks
-	install -m 755 suma_completehook.sh $(DEST_LIBDIR)/hooks
 	install -m 755 suma-storage-server $(DEST_BINDIR)/suma-storage
 
 install-proxy: install-common
@@ -23,6 +22,6 @@ install-proxy: install-common
 
 tarball:
 	mkdir susemanager-cloud-setup-$(version)
-	cp LICENSE Makefile suma_completehook.sh susemanager-cloud-setup-functions.sh suma-storage-server suma-storage-proxy susemanager-cloud-setup-$(version)
+	cp LICENSE Makefile susemanager-cloud-setup-functions.sh suma-storage-server suma-storage-proxy susemanager-cloud-setup-$(version)
 	tar czf susemanager-cloud-setup-$(version).tar.gz susemanager-cloud-setup-$(version)
 	rm -r susemanager-cloud-setup-$(version)
