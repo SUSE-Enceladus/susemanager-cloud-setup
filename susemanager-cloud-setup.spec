@@ -29,7 +29,7 @@ ExclusiveArch:  do-not-build
 %endif
 
 Name:           %{base_name}%{flavor_suffix}
-Version:        1.6
+Version:        5.0
 Release:        0
 Summary:        Cloud specific setup scripts for SUSE Manager
 License:        GPL-3.0-or-later
