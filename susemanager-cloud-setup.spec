@@ -17,32 +17,34 @@
 
 %define base_name susemanager-cloud-setup
 
-%if "@BUILD_FLAVOR@" == ""
-%define flavor_suffix %nil
-ExclusiveArch:  do-not-build
-%endif
-%if "@BUILD_FLAVOR@" == "server"
-%define flavor_suffix -server
-%endif
-%if "@BUILD_FLAVOR@" == "proxy"
-%define flavor_suffix -proxy
-%endif
-
-Name:           %{base_name}%{flavor_suffix}
+Name:           %{base_name}
 Version:        5.0
 Release:        0
-Summary:        Cloud specific setup scripts for SUSE Manager
+Summary:        Storage setup scripts for SUSE Manager
 License:        GPL-3.0-or-later
 Group:          System/Management
 Url:            https://github.com/SUSE-Enceladus/susemanager-cloud-setup
 Source:         %{base_name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
-Provides:       %{base_name}
-Conflicts:      %{base_name}
 
-%description -n %{base_name}%{flavor_suffix}
-Scripts that help setting up SUSE Manager in the cloud.
+%description
+Scripts that help setting up SUSE Manager storage after deployment.
+
+%package server
+Summary: Storage setup scripts for SUSE Manager Server
+Conflicts:      %{base_name}-proxy
+
+%description server
+Scripts that help setting up SUSE Manager Server storage after deployment.
+
+%package proxy
+Summary: Storage setup scripts for SUSE Manager Proxy
+Conflicts:      %{base_name}-server
+
+%description proxy
+Scripts that help setting up SUSE Manager Proxy storage after deployment.
+
 
 %prep
 %setup -q -n %{base_name}-%{version}
@@ -50,13 +52,20 @@ Scripts that help setting up SUSE Manager in the cloud.
 %build
 
 %install
-make install%{flavor_suffix} DESTDIR=%{buildroot} PREFIX=%{_usr}
+make install DESTDIR=%{buildroot} PREFIX=%{_usr}
 
-%files -n %{base_name}%{flavor_suffix}
+%files server
 %defattr(-,root,root)
-%attr(755,root,root) %{_usr}/bin/suma-storage
+%attr(755,root,root) %{_usr}/bin/mgr-storage-server
 %attr(755,root,root) %{_usr}/lib/susemanager
 %license LICENSE
+
+%files proxy
+%defattr(-,root,root)
+%attr(755,root,root) %{_usr}/bin/mgr-storage-proxy
+%attr(755,root,root) %{_usr}/lib/susemanager
+%license LICENSE
+
 
 %changelog
 

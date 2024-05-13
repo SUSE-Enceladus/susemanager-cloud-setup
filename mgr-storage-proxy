@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 
-. /usr/lib/susemanager/bin/susemanager-cloud-setup-functions.sh || exit 1
+. /usr/lib/susemanager/susemanager-storage-setup-functions.sh || exit 1
 
 
 usage() {
