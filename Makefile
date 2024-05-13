@@ -16,7 +16,6 @@ install-common:
 	install -m 755 susemanager-storage-setup-functions.sh $(DEST_LIBDIR)
 
 install-server: install-common
-	mkdir -p $(DEST_LIBDIR)/hooks
 	install -m 755 mgr-storage-server $(DEST_BINDIR)/mgr-storage-server
 
 install-proxy: install-common
