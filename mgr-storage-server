@@ -51,6 +51,11 @@ if [ -z "$storage_disk" ] || [ ! -b "$storage_disk" ]; then
     usage
     die "Given storage disk does not exist or is not a block device."
 fi
+check_device_empty $storage_disk
+if is_btrfs_subvolume $storage_location; then
+    umount_subvolume $storage_location
+fi
+check_mountpoint $storage_location
 
 if [ -n "$2" ]; then
     database_disk=$(linux_device $2)
@@ -60,6 +65,11 @@ if [ -n "$2" ]; then
     fi
     database_location="/var/lib/containers/storage/volumes/var-pgsql"
     database_location_tmp="/var/lib/containers/storage/pgsql_storage_tmp"
+    check_device_empty $database_disk
+    if is_btrfs_subvolume $database_location; then
+        umount_subvolume $database_location
+    fi
+    check_mountpoint $database_location
 else
     database_disk=$storage_disk
 fi

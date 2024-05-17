@@ -48,6 +48,11 @@ if [ -z "$storage_disk" ] || [ ! -b "$storage_disk" ];then
     usage
     die "Given storage disk does not exist or is not a block device."
 fi
+check_device_empty $storage_disk
+if is_btrfs_subvolume $storage_location; then
+    umount_subvolume $storage_location
+fi
+check_mountpoint $storage_location
 
 info "Checking disk for content signature"
 check_content_signature $storage_disk

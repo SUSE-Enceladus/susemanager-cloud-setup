@@ -46,6 +46,35 @@ check_content_signature() {
     fi
 }
 
+check_device_empty() {
+    test -z "$1" && die "check_device_empty called without argument"
+    local device=$(linux_device $1)
+    local part=$(get_first_partition_device $1)
+    if [ -b "$part" ]; then
+        check_content_signature $part
+    fi
+}
+
+is_btrfs_subvolume() {
+    test -z "$1" && die "is_btrfs_subvolume called without argument"
+    local mountpoint=${1%/}
+    if grep -qi "subvol=@$mountpoint" /etc/fstab; then
+        return 0
+    fi
+    return 1
+}
+
+
+
+check_mountpoint() {
+    test -z "$1" && die "check_mountpoint called without argument"
+    local mountpoint=${1%/}
+    [[ $mountpoint == /* ]] || die "Mountpoint $mountpoint is not an absolute path"
+    if grep -qi "$mountpoint" /etc/fstab; then
+        die "$mountpoint already in /etc/fstab"
+    fi
+}
+
 get_first_partition_device() {
     test -z "$1" && die "get_first_partition_device called without argument"
     local device=$1
@@ -109,6 +138,20 @@ mount_storage() {
     if [ $? != 0 ]; then
         die "Mounting $part failed with $result"
     fi
+}
+
+umount_subvolume() {
+    test -z "$1" && die "umount_subvolume called without arguments"
+    local mount_point=$1
+    if ! is_btrfs_subvolume $mount_point ; then
+        die "$mount_point is not a btrfs subvolume"
+    fi
+    local result=$(umount $mount_point 2>&1)
+    if [ $? != 0 ]; then
+        die "Unmounting $mount_point failed with $result"
+    fi
+    cp /etc/fstab /etc/fstab.$(date +"%Y%m%d%H%M%S")
+    sed -i 's|.*subvol=@/var/lib/containers/storage/volumes/\?[[:space:],]\+.*||' /etc/fstab
 }
 
 remount_storage() {
