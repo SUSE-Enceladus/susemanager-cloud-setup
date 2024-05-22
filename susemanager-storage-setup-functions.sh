@@ -68,10 +68,18 @@ is_btrfs_subvolume() {
 
 check_mountpoint() {
     test -z "$1" && die "check_mountpoint called without argument"
-    local mountpoint=${1%/}
-    [[ $mountpoint == /* ]] || die "Mountpoint $mountpoint is not an absolute path"
-    if grep -qi "$mountpoint" /etc/fstab; then
-        die "$mountpoint already in /etc/fstab"
+    local mount_point=${1%/}
+    [[ $mount_point == /* ]] || die "Mountpoint $mount_point is not an absolute path"
+    if grep -qi "$mount_point" /etc/fstab; then
+        die "$mount_point already in /etc/fstab"
+    fi
+    # check if mount_point exists
+    if [ ! -d $mount_point ]; then
+        mkdir $mount_point || die "Unable to create $mount_point"
+	chmod 0700 $mount_point
+	if /usr/sbin/selinuxenabled; then
+            chcon --reference=$mount_point/.. $mount_point || die "Unable to set selinux context to $mount_point"
+	fi
     fi
 }
 
@@ -134,6 +142,10 @@ mount_storage() {
     local part=$(get_first_partition_device $1)
     local mount_point=$2
     mkdir -p $mount_point
+    chmod 0700 $mount_point
+    if /usr/sbin/selinuxenabled; then
+        chcon --reference=$mount_point/.. $mount_point || die "Unable to set selinux context to $mount_point"
+    fi
     local result=$(mount $part $mount_point 2>&1)
     if [ $? != 0 ]; then
         die "Mounting $part failed with $result"
@@ -165,6 +177,10 @@ remount_storage() {
     fi
     if [ ! -d $mount_point ]; then
         mkdir -p $mount_point
+        chmod 0700 $mount_point
+        if /usr/sbin/selinuxenabled; then
+            chcon --reference=$mount_point/.. $mount_point || die "Unable to set selinux context to $mount_point"
+        fi
     fi
     mount_storage $device $mount_point
     rmdir $tmp_mount_point

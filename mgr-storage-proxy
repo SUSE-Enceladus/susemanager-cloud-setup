@@ -66,7 +66,7 @@ create_filesystem $storage_disk $storage_fs
 info "Mounting storage at $storage_location_tmp"
 mount_storage $storage_disk $storage_location_tmp
 
-if systemctl status uyuni-proxy-httpd.service >/dev/null ; then
+if systemctl -q is-active uyuni-proxy-httpd.service >/dev/null ; then
     proxy_running=yes
     info "Stopping proxy service"
     mgrpxy stop

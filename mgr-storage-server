@@ -74,7 +74,7 @@ else
     database_disk=$storage_disk
 fi
 
-if systemctl status uyuni-server.service >/dev/null ; then
+if systemctl -q is-active uyuni-server.service >/dev/null ; then
     spacewalk_running=yes
     info "Stop spacewalk services"
     mgradm stop
