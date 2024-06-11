@@ -21,7 +21,7 @@ Name:           %{base_name}
 Version:        5.0
 Release:        0
 Summary:        Storage setup scripts for SUSE Manager
-License:        GPL-3.0-or-later
+License:        GPL-3.0-only
 Group:          System/Management
 Url:            https://github.com/SUSE-Enceladus/susemanager-cloud-setup
 Source:         %{base_name}-%{version}.tar.gz
