@@ -8,20 +8,21 @@ DEST_LIBDIR=$(DESTDIR)$(LIBDIR)
 
 version=$(shell rpm -q --specfile --qf '%{VERSION}\n' susemanager-cloud-setup.spec 2>/dev/null 2>/dev/null | head -n1)
 
+install: install-server install-proxy
+
 install-common:
 	mkdir -p $(DEST_BINDIR)
-	mkdir -p $(DEST_LIBDIR)/bin
-	install -m 755 susemanager-cloud-setup-functions.sh $(DEST_LIBDIR)/bin
+	mkdir -p $(DEST_LIBDIR)
+	install -m 755 susemanager-storage-setup-functions.sh $(DEST_LIBDIR)
 
 install-server: install-common
-	mkdir -p $(DEST_LIBDIR)/hooks
-	install -m 755 suma-storage-server $(DEST_BINDIR)/suma-storage
+	install -m 755 mgr-storage-server $(DEST_BINDIR)/mgr-storage-server
 
 install-proxy: install-common
-	install -m 755 suma-storage-proxy $(DEST_BINDIR)/suma-storage
+	install -m 755 mgr-storage-proxy $(DEST_BINDIR)/mgr-storage-proxy
 
 tarball:
 	mkdir susemanager-cloud-setup-$(version)
-	cp LICENSE Makefile susemanager-cloud-setup-functions.sh suma-storage-server suma-storage-proxy susemanager-cloud-setup-$(version)
+	cp LICENSE Makefile susemanager-storage-setup-functions.sh mgr-storage-server mgr-storage-proxy susemanager-cloud-setup-$(version)
 	tar czf susemanager-cloud-setup-$(version).tar.gz susemanager-cloud-setup-$(version)
 	rm -r susemanager-cloud-setup-$(version)
